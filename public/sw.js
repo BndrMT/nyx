@@ -3,7 +3,14 @@ const CACHE_NAME = "nyx-pwa-v1";
 const ASSETS = [
   "/",
   "/index.html",
-  "/manifest.json"
+  "/manifest.json",
+  "/fonts/fonts.css",
+  "/fonts/cairo-arabic.woff2",
+  "/fonts/cairo-latin.woff2",
+  "/fonts/tajawal-300.woff2",
+  "/fonts/tajawal-400.woff2",
+  "/fonts/tajawal-500.woff2",
+  "/fonts/tajawal-700.woff2"
 ];
 
 self.addEventListener("install", (event) => {
