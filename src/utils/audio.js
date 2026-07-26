@@ -1,6 +1,5 @@
-// Nyx Premium Audio Engine — Multi-Layer Ambient Soundscape
-// Wind (Noise1 → Lowpass + LFO) | Rain (Noise2 → Multi-Bandpass) | Hearth (Osc → 70Hz) | Convolver Reverb
-// All processing is 100% local via Web Audio API — zero network requests
+// 🔇 صوت التنفس موقّف مؤقتاً — بانتظار ملف صوتي من المستخدم
+// تم تعطيل الصوت في المودال أسفله
 
 let audioCtx = null;
 

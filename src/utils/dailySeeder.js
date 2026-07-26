@@ -176,6 +176,58 @@ export async function fetchAndSeedDailyVents() {
     }
 
     localStorage.setItem("nyx_last_daily_fetch", now.toString());
+
+    // توزيع تفاعلات وهمية لزخم المنصة
+    seedReactions();
+  }
+}
+
+/**
+ * توزيع تفاعلات عشوائية على البطاقات لخلق جو من التفاعل والزخم
+ * - البوح الجديد (أول بوح في القائمة): 3 تفاعلات متنوعة
+ * - بوحين عشوائيين قديمين: 1-2 تفاعل لكل منهما
+ * - لا يلمس تفاعلات المستخدمين الحقيقية
+ */
+function seedReactions() {
+  try {
+    const LOCAL_POSTS_KEY = "nyx_local_posts_v1";
+    const data = localStorage.getItem(LOCAL_POSTS_KEY);
+    if (!data) return;
+
+    const posts = JSON.parse(data);
+    if (posts.length === 0) return;
+
+    const reactions = ["not-alone", "i-feel-you", "sending-peace", "stay-strong", "same-story", "god-bless"];
+
+    // 1. البوح الجديد (أول بوح = الأحدث) ← 3 تفاعلات
+    const newest = posts[0];
+    if (newest) {
+      const shuffled = [...reactions].sort(() => 0.5 - Math.random());
+      const chosen = shuffled.slice(0, 3);
+      chosen.forEach((r) => {
+        newest.reactions[r] = (newest.reactions[r] || 0) + 1;
+      });
+    }
+
+    // 2. بوحين عشوائيين قديمين (من البقية) ← 1-2 تفاعل
+    if (posts.length > 2) {
+      const oldPosts = posts.slice(1); // استثني الأحدث
+      const shuffledOld = oldPosts.sort(() => 0.5 - Math.random());
+      const targets = shuffledOld.slice(0, Math.min(2, shuffledOld.length));
+
+      targets.forEach((post) => {
+        const count = 1 + Math.floor(Math.random() * 2); // 1-2
+        const shuffled = [...reactions].sort(() => 0.5 - Math.random());
+        const chosen = shuffled.slice(0, count);
+        chosen.forEach((r) => {
+          post.reactions[r] = (post.reactions[r] || 0) + 1;
+        });
+      });
+    }
+
+    localStorage.setItem(LOCAL_POSTS_KEY, JSON.stringify(posts));
+  } catch (_e) {
+    // صامت — لا نريد أن نعطل التطبيق
   }
 }
 

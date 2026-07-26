@@ -3,19 +3,20 @@ import { X, Volume2, VolumeX, Moon, CloudRain, Wind } from "lucide-react";
 import { startNightAmbientSound, stopNightAmbientSound, updateBreathingSoundPhase, setMasterVolume } from "../utils/audio";
 
 export default function BreathingModal({ isOpen, onClose }) {
-  const [phase, setPhase] = useState("inhale"); // "inhale" | "hold" | "exhale"
+  const [phase, setPhase] = useState("inhale");
   const [counter, setCounter] = useState(4);
-  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [isAudioMuted, setIsAudioMuted] = useState(true); // 🔇 معطل مؤقتاً
   const [volume, setVolume] = useState(0.6);
-  const [sessionMinutes, setSessionMinutes] = useState(0); // 0 = unlimited
+  const [sessionMinutes, setSessionMinutes] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
-      if (!isAudioMuted) {
-        startNightAmbientSound();
-        updateBreathingSoundPhase("inhale");
-      }
+      // 🔇 الصوت موقّف — بانتظار ملف المستخدم
+      // if (!isAudioMuted) {
+      //   startNightAmbientSound();
+      //   updateBreathingSoundPhase("inhale");
+      // }
 
       let currentPhase = "inhale";
       let count = 4;
@@ -33,9 +34,10 @@ export default function BreathingModal({ isOpen, onClose }) {
             currentPhase = "inhale";
             count = 4;
           }
-          if (!isAudioMuted) {
-            updateBreathingSoundPhase(currentPhase);
-          }
+          // 🔇 صوت معطل
+          // if (!isAudioMuted) {
+          //   updateBreathingSoundPhase(currentPhase);
+          // }
         }
         setPhase(currentPhase);
         setCounter(count);
@@ -43,10 +45,10 @@ export default function BreathingModal({ isOpen, onClose }) {
 
       return () => {
         clearInterval(timer);
-        stopNightAmbientSound();
+        // stopNightAmbientSound(); // 🔇 معطل
       };
     }
-  }, [isOpen, isAudioMuted]);
+  }, [isOpen]); // أزل isAudioMuted من التبعيات مؤقتاً
 
   // Session timer countdown
   useEffect(() => {
