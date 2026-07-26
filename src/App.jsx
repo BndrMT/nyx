@@ -142,7 +142,9 @@ export default function App() {
         
         {/* Serene Poetic Hero Header Banner */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-slate-900/60 border border-purple-500/20 p-6 sm:p-8 mb-8 text-center sm:text-right shadow-2xl">
-          <div className="absolute top-0 left-0 -ml-16 -mt-16 w-48 h-48 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
+          {/* Aurora Glow Orbs */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-purple-600/15 blur-3xl pointer-events-none animate-aurora-1" />
+          <div className="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none animate-aurora-2" />
           
           <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
             

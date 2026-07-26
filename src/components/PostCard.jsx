@@ -76,7 +76,7 @@ export default function PostCard({ post, userReactions, onToggleReaction, onShar
   };
 
   return (
-    <article className={`group relative rounded-3xl bg-gradient-to-b from-slate-900/90 via-[#111523]/80 to-[#0C0E17]/95 border p-5 sm:p-6 transition-all duration-300 ${getTopReactionGlow()}`}>
+    <article className={`group relative rounded-3xl bg-gradient-to-b from-slate-900/90 via-[#111523]/80 to-[#0C0E17]/95 border p-5 sm:p-6 transition-all duration-300 ${getTopReactionGlow()} animate-card-entrance`}>
       
       {/* Top Header info */}
       <div className="flex items-center justify-between mb-4">
