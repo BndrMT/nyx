@@ -1,10 +1,18 @@
-import { neon } from "@neondatabase/serverless";
+// Nyx Database Connection Helper
+// Uses Neon serverless Postgres via Vercel environment variable
+// NEVER hardcode credentials — DATABASE_URL set via Vercel dashboard
 
-const DATABASE_URL = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_xc9fdAGYlFM6@ep-proud-frost-za18qfd5-pooler.c-2.eu-west-2.aws.neon.tech/neondb?sslmode=require";
+import { neon } from "@neondatabase/serverless";
 
 let cached = null;
 
 export function getDb() {
-  if (!cached) cached = neon(DATABASE_URL);
+  if (!cached) {
+    const url = process.env.DATABASE_URL;
+    if (!url) {
+      throw new Error("DATABASE_URL environment variable is not set");
+    }
+    cached = neon(url);
+  }
   return cached;
 }
