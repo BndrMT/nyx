@@ -89,6 +89,50 @@ const CURATED_DAILY_FEED = [
   { content: "أكتب ما لا أستطيع قوله، لأن الحروف أصدق من اللسان.", tagId: "unspoken-choke" },
   { content: "كم من كلمة دفنت في صدري لأن الأرض التي ستنبت فيها لم تعد صالحة للزرع.", tagId: "unspoken-choke" },
   { content: "أتمنى لو يستطيع الناس سماع أفكاري، ليعرفوا كم أحبهم وكم يوجعني بعدهم.", tagId: "unspoken-choke" },
+  // === silent-grief ===
+  { content: "تتظاهر بأنك بخير مرات كثيرة، حتى تنسى أن من حقك ألا تكون بخير أحياناً.", tagId: "silent-grief" },
+  { content: "في كل صباح أرتدي قناع الثبات، وفي كل ليلة أخلعه وأواجه نفسي.", tagId: "silent-grief" },
+  { content: "الجراح التي لا يراها أحد هي الأكثر إيلاماً لأنها بلا ضمادة.", tagId: "silent-grief" },
+  { content: "لا أعرف متى بدأ هذا الثقل في صدري، لكني أعرف أنه لم يغب منذ زمن.", tagId: "silent-grief" },
+  { content: "أبكي بصمت كي لا يقلق أحد، وأضحك بصوت كي لا يشك أحد.", tagId: "silent-grief" },
+  // === soul-exhaustion ===
+  { content: "أريد يوماً لا أفكر فيه بأحد، ولا أحد يفكر بي. فقط أنا وروحي في سكون.", tagId: "soul-exhaustion" },
+  { content: "أعطي الجميع من روحي حتى صارت روحي في need إلى مدد.", tagId: "soul-exhaustion" },
+  { content: "التعب ليس جسدياً فقط.. هناك تعب في الروح لا يزيله إلا احتضان صادق.", tagId: "soul-exhaustion" },
+  { content: "أن تكون قوياً طوال الوقت.. تلك هي أتعس وظيفة في العالم.", tagId: "soul-exhaustion" },
+  { content: "أحتاج إلى إجازة من حياتي، ولو ليوم واحد.", tagId: "soul-exhaustion" },
+  // === disappointment ===
+  { content: "ليس كل من قال 'أنا معك' كان صادقاً. بعضهم كان فقط يراقب سقوطك.", tagId: "disappointment" },
+  { content: "الخذلان لا يأتي من عدو، فالعدو لا نتوقع منه شيئاً. الخذلان ممن نحب.", tagId: "disappointment" },
+  { content: "سامحت كثيرين، ليس لأنهم يستحقون، بل لأنني أستحق السلام.", tagId: "disappointment" },
+  { content: "أتعلمت أن لا أضع كل آمالي بشخص واحد، فالجميع يخطئون.", tagId: "disappointment" },
+  { content: "أصعب لحظة حين تدرك أن الشخص الذي ضحيت من أجله لم يضحِ من أجلك يوماً.", tagId: "disappointment" },
+  // === future-anxiety ===
+  { content: "الخوف من المجهول يثقل الخطى، لكن التوقف أخطر من السير في الظلام.", tagId: "future-anxiety" },
+  { content: "أسئلة المستقبل ترعبني: هل سأكون بخير؟ هل سأنجح؟ هل سأكون سعيداً؟", tagId: "future-anxiety" },
+  { content: "القلق كرسي هزاز، يحركك كثيراً لكنه لا يوصلك إلى أي مكان.", tagId: "future-anxiety" },
+  { content: "أحتاج يقيناً واحداً في هذه الحياة المليئة بالشكوك.", tagId: "future-anxiety" },
+  { content: "كلما كبرت، زادت الأسئلة وقلت الإجابات.", tagId: "future-anxiety" },
+  // === longing ===
+  { content: "الحنين وجع جميل، مؤلم لكنه يثبت أننا أحببنا بصدق.", tagId: "longing" },
+  { content: "في كل أغنية أسمعها، هناك مقطع يجرجر معه ذاكرة كاملة.", tagId: "longing" },
+  { content: "أشتاق لأشخاص لم يعودوا موجودين، ولأيام لن تعود أبداً.", tagId: "longing" },
+  // === departed-loved-ones ===
+  { content: "الموت لا ينهي الحكاية، بل يبدأ فصلاً جديداً من الشوق الذي لا ينتهي.", tagId: "departed-loved-ones" },
+  { content: "كل عيد يمر يذكرني بكرسي أصبح فارغاً.", tagId: "departed-loved-ones" },
+  { content: "ما زلت أدعو لهم في صلاتي، كأنهم مسافرون سيعودون.", tagId: "departed-loved-ones" },
+  // === faltering-hope ===
+  { content: "الرجاء شمعة صغيرة في ليل طويل. قد لا تضيء كل الظلام، لكنها تكفي لترينا خطوة واحدة قادمة.", tagId: "faltering-hope" },
+  { content: "كل صباح أقول: لعل اليوم يحمل شيئاً مختلفاً.", tagId: "faltering-hope" },
+  { content: "ربما الغد يحمل ما لم تحلم به اليوم.", tagId: "faltering-hope" },
+  // === path-confusion ===
+  { content: "أكبر حيرة في الحياة: حين تعرف ما تريد لكنك لا تعرف كيف تصل إليه.", tagId: "path-confusion" },
+  { content: "الضياع ليس نقصاً في الذكاء، بل كثرة في الطرق.", tagId: "path-confusion" },
+  { content: "مشيت في دروب كثيرة، وكلها أوصلتني إلى سؤال واحد: من أنا حقاً؟", tagId: "path-confusion" },
+  // === unspoken-choke ===
+  { content: "الكلمات التي لم تُقل أثقل من تلك التي قيلت.", tagId: "unspoken-choke" },
+  { content: "أتمنى لو يقرأ الناس ما في قلبي لا ما ينطق به لساني.", tagId: "unspoken-choke" },
+  { content: "أكتب لأتنفس. الحروف هي أكسجيني حين يضيق بي الهواء.", tagId: "unspoken-choke" },
 ];
 
 export async function fetchAndSeedDailyVents() {
@@ -98,47 +142,37 @@ export async function fetchAndSeedDailyVents() {
   // Check if 24 hours have passed
   if (!lastFetch || (now - Number(lastFetch)) > 24 * 60 * 60 * 1000) {
     
-    // Try Reddit API first
+    // Try Reddit API first (1 post)
     let seeded = false;
     try {
       const response = await fetch(REDDIT_API);
       const data = await response.json();
       
       if (data.success && data.posts && data.posts.length > 0) {
-        for (const post of data.posts) {
-          const safety = checkSafety(post.content);
-          if (safety.isSafe) {
-            saveNewPost({
-              content: post.content.trim(),
-              tagId: inferTag(post.content),
-              retentionDays: 7
-            });
-          }
-        }
-        seeded = true;
-        console.log("Nyx: 3 Reddit vents seeded successfully! (zero-knowledge)");
-      }
-    } catch (err) {
-      console.log("Nyx: Reddit API unavailable, using curated fallback.");
-    }
-
-    // Fallback: curated list
-    if (!seeded) {
-      const shuffled = [...CURATED_DAILY_FEED].sort(() => 0.5 - Math.random());
-      const selectedThree = shuffled.slice(0, 3);
-
-      selectedThree.forEach((item) => {
-        const safety = checkSafety(item.content);
+        const post = data.posts[0]; // Take only 1
+        const safety = checkSafety(post.content);
         if (safety.isSafe) {
-          const cleanContent = item.content.trim().replace(/https?:\/\/\S+/g, "").replace(/#\S+/g, "");
           saveNewPost({
-            content: cleanContent,
-            tagId: item.tagId,
+            content: post.content.trim(),
+            tagId: inferTag(post.content),
             retentionDays: 7
           });
+          seeded = true;
         }
-      });
-      console.log("Nyx: 3 curated vents seeded (fallback mode).");
+      }
+    } catch (_e) { /* Reddit unavailable */ }
+
+    // Fallback: 1 curated text
+    if (!seeded) {
+      const chosen = CURATED_DAILY_FEED[Math.floor(Math.random() * CURATED_DAILY_FEED.length)];
+      const safety = checkSafety(chosen.content);
+      if (safety.isSafe) {
+        saveNewPost({
+          content: chosen.content.trim(),
+          tagId: chosen.tagId,
+          retentionDays: 7
+        });
+      }
     }
 
     localStorage.setItem("nyx_last_daily_fetch", now.toString());
