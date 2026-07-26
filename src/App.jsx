@@ -13,6 +13,7 @@ import Footer from "./components/Footer";
 
 import { getStoredPosts, saveNewPost, togglePostReaction, getUserReactions, getOrCreateDeviceUUID, deleteMyPost } from "./utils/storage";
 import { registerServiceWorker } from "./utils/pwa";
+import { fetchAndSeedDailyVents } from "./utils/dailyFetcher";
 import { Heart, Sparkles, ShieldCheck, PenTool, Wind, Moon, RefreshCw } from "lucide-react";
 
 const BATCH_SIZE = 6;
@@ -42,6 +43,10 @@ export default function App() {
   useEffect(() => {
     getOrCreateDeviceUUID();
     registerServiceWorker();
+
+    // Trigger daily automated 3-vents seeding with zero-knowledge privacy
+    fetchAndSeedDailyVents();
+
     setPosts(getStoredPosts());
     setUserReactions(getUserReactions());
   }, []);
