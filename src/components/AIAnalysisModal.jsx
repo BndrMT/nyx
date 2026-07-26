@@ -202,7 +202,7 @@ export default function AIAnalysisModal({ isOpen, onClose, post }) {
 
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
-                onClick={handleConsentDecline}
+                onClick={onClose}
                 className="flex-1 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800/80 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all"
               >
                 غير موافق
