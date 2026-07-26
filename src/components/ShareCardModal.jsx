@@ -243,8 +243,8 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
               <Share2 className="w-4 h-4 text-purple-300" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100">بطاقة البوح السينمائية (PNG)</h2>
-              <p className="text-[11px] text-slate-400">تتضمن أوسمة التفاعلات ورمز QR المنصة</p>
+              <h2 className="text-base font-bold text-slate-100">بطاقة بوح</h2>
+              <p className="text-[11px] text-slate-400">" لنمحي مرارة ما في قلوبنا "</p>
             </div>
           </div>
           <button
