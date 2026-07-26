@@ -78,10 +78,10 @@ export default function PostCard({ post, userReactions, onToggleReaction, onShar
   return (
     <article className={`group relative rounded-3xl bg-gradient-to-b from-slate-900/90 via-[#111523]/80 to-[#0C0E17]/95 border p-5 sm:p-6 transition-all duration-300 ${getTopReactionGlow()} animate-card-entrance`}>
       
-      {/* Top Header info */}
+      {/* Top Header info — symmetric layout */}
       <div className="flex items-center justify-between mb-4">
         {/* Author Tag Badge */}
-        <div className="flex items-center gap-2">
+        <div className="flex-1 flex justify-start">
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-950/70 border border-purple-800/40 text-purple-200">
             <span>{tag.icon}</span>
             <span>{tag.name}</span>
@@ -89,7 +89,7 @@ export default function PostCard({ post, userReactions, onToggleReaction, onShar
         </div>
 
         {/* Share & Timestamp */}
-        <div className="flex items-center gap-2 text-[11px] text-slate-500">
+        <div className="flex-1 flex justify-end items-center gap-2 text-[11px] text-slate-500">
           <button
             onClick={() => onShare && onShare(post)}
             className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-purple-300 hover:border-purple-500/40 transition-all"

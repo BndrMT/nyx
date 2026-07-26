@@ -63,8 +63,8 @@ export default function CreatePostModal({ isOpen, onClose, onSubmitPost, onTrigg
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           
-          {/* Author Emotional Tag Selector - scrollable with max-height */}
-          <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto no-scrollbar p-1 rounded-xl bg-slate-950/30 border border-slate-800/50">
+          {/* Author Emotional Tag Selector — full display, no scroll */}
+          <div className="flex flex-wrap gap-2 pb-2">
             {EMOTIONAL_TAGS.filter((t) => t.id !== "all").map((tag) => {
               const isSelected = selectedTagId === tag.id;
               return (
