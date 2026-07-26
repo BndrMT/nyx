@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { X, Share2, Download, Copy, Check, Moon, Image as ImageIcon } from "lucide-react";
+import { X, Share2, Copy, Check, Moon, Image as ImageIcon } from "lucide-react";
 import { EMOTIONAL_TAGS } from "../data/tags";
+import { EMPATHETIC_REACTIONS } from "../data/reactions";
 
 export default function ShareCardModal({ isOpen, onClose, post }) {
   const [copied, setCopied] = useState(false);
@@ -10,12 +11,12 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
 
   const tag = EMOTIONAL_TAGS.find((t) => t.id === post.tagId) || EMOTIONAL_TAGS[0];
 
-  // 1. Pure HTML5 Canvas Generator for 100% Real PNG Image Download
+  // HTML5 Canvas Generator with Reaction Icons/Counts & QR Code Space
   const handleDownloadImage = () => {
     setDownloading(true);
     try {
       const canvas = document.createElement("canvas");
-      canvas.width = 1080; // High resolution 1080x1080 Story / Card size
+      canvas.width = 1080;
       canvas.height = 1080;
       const ctx = canvas.getContext("2d");
 
@@ -46,21 +47,21 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
       ctx.font = "24px system-ui, Cairo, sans-serif";
       ctx.fillText("تحت سِتْر الليل", 980, 170);
 
-      // Divider line
+      // Top Divider
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(100, 220);
-      ctx.lineTo(980, 220);
+      ctx.moveTo(100, 210);
+      ctx.lineTo(980, 210);
       ctx.stroke();
 
       // Wrapped Vent Text
       ctx.fillStyle = "#F1F5F9";
-      ctx.font = "38px system-ui, Cairo, sans-serif";
+      ctx.font = "36px system-ui, Cairo, sans-serif";
       
       const words = (`«${post.content}»`).split(" ");
       let line = "";
-      let y = 320;
+      let y = 300;
       const maxWidth = 880;
 
       for (let n = 0; n < words.length; n++) {
@@ -69,34 +70,92 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
         if (metrics.width > maxWidth && n > 0) {
           ctx.fillText(line, 980, y);
           line = words[n] + " ";
-          y += 65;
+          y += 60;
         } else {
           line = testLine;
         }
       }
       ctx.fillText(line, 980, y);
 
-      // Bottom Watermark Divider
+      // Empathetic Reactions Icons & Counts Section on Image
+      let rxY = y + 70;
+      if (rxY > 750) rxY = 750; // Keep within card limits
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.beginPath();
+      ctx.moveTo(100, rxY);
+      ctx.lineTo(980, rxY);
+      ctx.stroke();
+
+      // Draw Top Reaction Badges
+      let rxX = 980;
+      ctx.font = "22px system-ui, Cairo, sans-serif";
+      ctx.textAlign = "right";
+
+      EMPATHETIC_REACTIONS.forEach((r) => {
+        const count = post.reactions?.[r.id] || 0;
+        if (count > 0 && rxX > 200) {
+          const badgeText = `${r.icon} ${r.label} (${count})`;
+          const width = ctx.measureText(badgeText).width + 30;
+
+          // Draw pill background
+          ctx.fillStyle = "rgba(26, 32, 53, 0.9)";
+          ctx.beginPath();
+          ctx.roundRect(rxX - width, rxY + 20, width, 44, 20);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(168, 85, 247, 0.4)";
+          ctx.stroke();
+
+          // Draw pill text
+          ctx.fillStyle = "#E2E8F0";
+          ctx.fillText(badgeText, rxX - 15, rxY + 50);
+
+          rxX -= (width + 15);
+        }
+      });
+
+      // Bottom Watermark & QR Code Divider
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
       ctx.beginPath();
-      ctx.moveTo(100, 920);
-      ctx.lineTo(980, 920);
+      ctx.moveTo(100, 910);
+      ctx.lineTo(980, 910);
       ctx.stroke();
 
       // Brand Title & Subtitle
       ctx.fillStyle = "#E9D5FF";
       ctx.font = "bold 36px system-ui, Cairo, sans-serif";
-      ctx.fillText("نِيكْس (Nyx)", 980, 975);
+      ctx.fillText("نِيكْس (Nyx)", 980, 965);
 
       ctx.fillStyle = "#A855F7";
-      ctx.font = "24px system-ui, Cairo, sans-serif";
-      ctx.fillText("نَهْرُ النِّسْيَانِ وَالْخَلاصِ", 980, 1015);
+      ctx.font = "22px system-ui, Cairo, sans-serif";
+      ctx.fillText("نَهْرُ النِّسْيَانِ وَالْخَلاصِ", 980, 1005);
+
+      // Aesthetic QR Code Placeholder Box Drawing
+      const qrSize = 100;
+      const qrX = 100;
+      const qrY = 930;
+
+      // Outer box
+      ctx.fillStyle = "#0B0D14";
+      ctx.beginPath();
+      ctx.roundRect(qrX, qrY, qrSize, qrSize, 12);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(168, 85, 247, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Simulated QR pattern grid
+      ctx.fillStyle = "#A855F7";
+      ctx.fillRect(qrX + 15, qrY + 15, 25, 25);
+      ctx.fillRect(qrX + 60, qrY + 15, 25, 25);
+      ctx.fillRect(qrX + 15, qrY + 60, 25, 25);
+      ctx.fillStyle = "#E9D5FF";
+      ctx.fillRect(qrX + 48, qrY + 48, 14, 14);
 
       // Trigger PNG File Download or Native Share
       canvas.toBlob((blob) => {
         if (!blob) return;
         
-        // If native mobile sharing is available (iOS Safari & Android Chrome)
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], "nyx-card.png", { type: "image/png" })] })) {
           const file = new File([blob], "nyx-card.png", { type: "image/png" });
           navigator.share({
@@ -105,7 +164,6 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
             text: `«${post.content}»`
           }).catch(() => {});
         } else {
-          // Standard browser image download trigger
           const link = document.createElement("a");
           link.download = `nyx-vent-card-${Date.now()}.png`;
           link.href = URL.createObjectURL(blob);
@@ -143,8 +201,8 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
               <Share2 className="w-4 h-4 text-purple-300" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100">بطاقة البوح (صورة ونَصّ)</h2>
-              <p className="text-[11px] text-slate-400">بطاقة صورة PNG سينمائية مجهولة 100%</p>
+              <h2 className="text-base font-bold text-slate-100">بطاقة البوح السينمائية (PNG)</h2>
+              <p className="text-[11px] text-slate-400">تتضمن أوسمة التفاعلات ورمز QR المنصة</p>
             </div>
           </div>
           <button
@@ -155,7 +213,7 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
           </button>
         </div>
 
-        {/* The Visual Share Card Preview */}
+        {/* Visual Share Card Preview */}
         <div className="my-4 p-0.5 rounded-3xl bg-gradient-to-b from-purple-600/30 via-indigo-600/20 to-purple-900/40">
           <div className="rounded-[23px] bg-gradient-to-b from-[#111422] via-[#0C0E18] to-[#080911] p-6 sm:p-8 text-right shadow-2xl relative overflow-hidden border border-white/10">
             
@@ -175,7 +233,20 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
               «{post.content}»
             </p>
 
-            {/* Card Watermark Footer */}
+            {/* Empathetic Reaction Counts Preview */}
+            <div className="flex flex-wrap gap-1.5 py-2 border-b border-white/5 mb-3">
+              {EMPATHETIC_REACTIONS.map((r) => {
+                const count = post.reactions?.[r.id] || 0;
+                if (count === 0) return null;
+                return (
+                  <span key={r.id} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 border border-purple-800/40 text-purple-200">
+                    {r.icon} {r.label} ({count})
+                  </span>
+                );
+              })}
+            </div>
+
+            {/* Card Watermark & QR Placeholder Footer */}
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-xl bg-purple-950/80 border border-purple-800/40 flex items-center justify-center">
@@ -187,6 +258,11 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
                   </h4>
                   <p className="text-[9px] text-purple-300/70 font-medium">نَهْرُ النِّسْيَانِ وَالْخَلاصِ</p>
                 </div>
+              </div>
+
+              {/* Aesthetic QR Code Box */}
+              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-purple-500/40 p-1 flex items-center justify-center text-[9px] text-purple-300 text-center font-mono shadow-inner">
+                [QR]
               </div>
             </div>
 
@@ -200,10 +276,10 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
           className="w-full py-3 mb-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white font-bold text-xs shadow-lg shadow-purple-950/50 hover:from-purple-500 hover:to-indigo-500 flex items-center justify-center gap-2 transition-all active:scale-95"
         >
           <ImageIcon className="w-4 h-4 text-purple-200" />
-          <span>{downloading ? "جارٍ إنشاء صورة PNG..." : "تحميل / مشاركة البطاقة كـ (صورة PNG)"}</span>
+          <span>{downloading ? "جارٍ رسم صورة PNG والتفاعلات والـ QR..." : "تحميل / مشاركة البطاقة كـ (صورة PNG مع التفاعلات والـ QR)"}</span>
         </button>
 
-        {/* Primary Action 2: Social Media Direct Links (Text format) */}
+        {/* Primary Action 2: Social Media Direct Links */}
         <div className="space-y-2.5">
           <span className="block text-xs font-semibold text-slate-400">
             أو مشاركة كـ (نَص ورابط):
@@ -249,7 +325,7 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
 
         {/* Footer Note */}
         <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
-          <span>صورة PNG سينمائية مجهولة 100% وخالية من أي بيانات شخصية</span>
+          <span>صورة PNG تتضمن التفاعلات الحية ورمز QR المنصة</span>
           <button onClick={onClose} className="text-slate-400 hover:text-white">إغلاق</button>
         </div>
 
