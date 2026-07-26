@@ -68,9 +68,15 @@ export default async function handler(req, res) {
             "User-Agent": "NyxApp/1.0 (emotional wellness)"
           }
         });
-        if (!response.ok) continue;
+        if (!response.ok) {
+          console.log("Reddit HTTP", response.status, "for", sub, term);
+          continue;
+        }
         const data = await response.json();
-        if (!data?.data?.children) continue;
+        if (!data?.data?.children || data.data.children.length === 0) {
+          console.log("No results for", sub, term);
+          continue;
+        }
 
         for (const child of data.data.children) {
           const t = child.data;
