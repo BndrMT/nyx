@@ -1,7 +1,6 @@
 // Automated Daily Anonymous Vents Seeding Utility (3 Vents / 24 Hours)
 // 100% Free, Zero-Knowledge Privacy Compliant (No handles, no IPs, no URLs, no metadata stored)
 
-import { EMOTIONAL_TAGS } from "../data/tags";
 import { checkSafety } from "./moderation";
 import { saveNewPost } from "./storage";
 

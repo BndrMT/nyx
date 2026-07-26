@@ -56,23 +56,22 @@ export default function App() {
   }, [activeTag]);
 
   useEffect(() => {
+    const el = loadMoreRef.current;
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isLoadingMore) {
-          handleLoadMore();
+      ([entry]) => {
+        if (entry.isIntersecting && !isLoadingMore) {
+          setDisplayedCount((prev) => prev + BATCH_SIZE);
+          setIsLoadingMore(true);
+          setTimeout(() => setIsLoadingMore(false), 400);
         }
       },
       { threshold: 0.5 }
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+    if (el) observer.observe(el);
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
+      if (el) observer.unobserve(el);
     };
   }, [displayedCount, posts, activeTag, isLoadingMore]);
 

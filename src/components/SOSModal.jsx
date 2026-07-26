@@ -1,8 +1,8 @@
 import React from "react";
-import { HeartHandshake, PhoneCall, ShieldCheck, X, LifeBuoy, Heart } from "lucide-react";
+import { ShieldCheck, X, LifeBuoy, Heart } from "lucide-react";
 import { CRISIS_HELPLINES } from "../data/helplines";
 
-export default function SOSModal({ isOpen, onClose, reason }) {
+export default function SOSModal({ isOpen, onClose, reason: _reason }) {
   if (!isOpen) return null;
 
   return (

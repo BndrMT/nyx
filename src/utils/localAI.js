@@ -9,6 +9,7 @@ export async function analyzePostEmotionsLocally(postContent, tagId) {
 
   const text = postContent || "";
   const tag = EMOTIONAL_TAGS.find((t) => t.id === tagId) || EMOTIONAL_TAGS[0];
+  // tag unused; kept for future multi-emotion scoring
 
   let emotionTone = "حالة شائكة وتحتاج للمواساة والاحتواء";
   let tenderReflection = "";

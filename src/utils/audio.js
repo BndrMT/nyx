@@ -5,7 +5,7 @@ let audioCtx = null;
 let noiseNode = null;
 let gainNode = null;
 let windFilter = null;
-let rainFilter = null;
+// rainFilter reserved for future dual-layer rain/wind separation
 let isPlaying = false;
 
 export function startNightAmbientSound() {
@@ -103,7 +103,7 @@ export function stopNightAmbientSound() {
     } else {
       isPlaying = false;
     }
-  } catch (e) {
+  } catch (_e) {
     isPlaying = false;
   }
 }

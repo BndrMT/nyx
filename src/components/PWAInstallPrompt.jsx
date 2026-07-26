@@ -1,5 +1,5 @@
 import React from "react";
-import { Download, Smartphone, Share, PlusSquare, Check, X, ShieldCheck } from "lucide-react";
+import { Smartphone, Share, PlusSquare, X, ShieldCheck } from "lucide-react";
 
 export default function PWAInstallPrompt({ isOpen, onClose }) {
   if (!isOpen) return null;

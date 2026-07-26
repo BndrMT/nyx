@@ -70,7 +70,7 @@ export default function PostCard({ post, userReactions, onToggleReaction, onShar
       if (diffHours < 24) return `منذ ${diffHours} ساعة`;
       const diffDays = Math.floor(diffHours / 24);
       return `منذ ${diffDays} يوم`;
-    } catch (e) {
+    } catch (_e) {
       return "منذ قليل";
     }
   };

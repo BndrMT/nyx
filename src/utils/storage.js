@@ -98,7 +98,7 @@ export function getMySentPostIds() {
   try {
     const data = localStorage.getItem(KEYS.MY_SENT_POST_IDS);
     return data ? JSON.parse(data) : [];
-  } catch (e) {
+  } catch (_e) {
     return [];
   }
 }
@@ -159,7 +159,7 @@ export function getUserReactions() {
   try {
     const data = localStorage.getItem(KEYS.USER_REACTIONS);
     return data ? JSON.parse(data) : {};
-  } catch (e) {
+  } catch (_e) {
     return {};
   }
 }

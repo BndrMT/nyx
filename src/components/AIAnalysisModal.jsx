@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Sparkles, X, Heart, ShieldCheck, RefreshCw, ChevronDown, ChevronUp, Lock } from "lucide-react";
+import { Sparkles, X, Heart, RefreshCw, ChevronDown, ChevronUp, Lock } from "lucide-react";
 import { analyzePostEmotionsLocally } from "../utils/localAI";
 
 export default function AIAnalysisModal({ isOpen, onClose, post }) {
