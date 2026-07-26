@@ -1,7 +1,7 @@
 import React from "react";
-import { Moon, Flame, Download } from "lucide-react";
+import { Moon, Flame, Download, Info } from "lucide-react";
 
-export default function Navbar({ onOpenMyPosts, onOpenPWAInstall }) {
+export default function Navbar({ onOpenMyPosts, onOpenPWAInstall, onOpenAbout }) {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#0B0D14]/85 border-b border-white/5 shadow-2xl">
       <div className="max-w-4xl mx-auto px-4 py-3.5 flex items-center justify-between">
@@ -16,6 +16,13 @@ export default function Navbar({ onOpenMyPosts, onOpenPWAInstall }) {
               <h1 className="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-indigo-100 to-slate-200">
                 نِيكْس <span className="text-xs font-normal text-purple-400/80">(Nyx)</span>
               </h1>
+              <button
+                onClick={onOpenAbout}
+                className="p-1 rounded-lg text-slate-500 hover:text-purple-300 hover:bg-slate-800/60 transition-all"
+                title="عن التطبيق"
+              >
+                <Info className="w-3.5 h-3.5" />
+              </button>
             </div>
             <p className="text-[11px] text-purple-300/80 hidden sm:block font-medium">
               نَهْرُ النِّسْيَانِ وَالْخَلاصِ

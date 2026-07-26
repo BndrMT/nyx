@@ -10,6 +10,7 @@ import MyPostsModal from "./components/MyPostsModal";
 import BreathingModal from "./components/BreathingModal";
 import ShareCardModal from "./components/ShareCardModal";
 import Footer from "./components/Footer";
+import AboutModal from "./components/AboutModal";
 
 import { getStoredPosts, saveNewPost, togglePostReaction, getUserReactions, getOrCreateDeviceUUID, deleteMyPost } from "./utils/storage";
 import { registerServiceWorker } from "./utils/pwa";
@@ -39,6 +40,7 @@ export default function App() {
   const [isBreathingOpen, setIsBreathingOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [selectedPostForShare, setSelectedPostForShare] = useState(null);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   useEffect(() => {
     getOrCreateDeviceUUID();
@@ -135,6 +137,7 @@ export default function App() {
       <Navbar
         onOpenMyPosts={() => setIsMyPostsOpen(true)}
         onOpenPWAInstall={() => setIsPWAInstallOpen(true)}
+        onOpenAbout={() => setIsAboutOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -298,6 +301,12 @@ export default function App() {
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
         post={selectedPostForShare}
+      />
+
+      {/* About Modal */}
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
       />
 
       {/* Footer */}
