@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, Moon, Heart, Share2 } from "lucide-react";
+import { Clock, Heart, Share2 } from "lucide-react";
 import { EMOTIONAL_TAGS } from "../data/tags";
 import { EMPATHETIC_REACTIONS } from "../data/reactions";
 import confetti from "canvas-confetti";
@@ -85,10 +85,6 @@ export default function PostCard({ post, userReactions, onToggleReaction, onShar
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-950/70 border border-purple-800/40 text-purple-200">
             <span>{tag.icon}</span>
             <span>{tag.name}</span>
-          </span>
-          <span className="text-[11px] text-slate-400 flex items-center gap-1 font-medium">
-            <Moon className="w-3 h-3 text-purple-400/80" />
-            تحت سِتْر الليل
           </span>
         </div>
 

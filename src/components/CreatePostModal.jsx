@@ -44,8 +44,8 @@ export default function CreatePostModal({ isOpen, onClose, onSubmitPost, onTrigg
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-lg rounded-3xl bg-slate-900 border border-purple-500/20 p-6 shadow-2xl overflow-hidden">
         
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/5">
+        {/* Symmetric Header */}
+        <div className="flex items-center justify-center pb-4 border-b border-white/5 relative">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-purple-950/80 border border-purple-800/40 flex items-center justify-center">
               <Heart className="w-4 h-4 text-purple-300" />
@@ -54,7 +54,7 @@ export default function CreatePostModal({ isOpen, onClose, onSubmitPost, onTrigg
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+            className="absolute left-0 p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -63,8 +63,8 @@ export default function CreatePostModal({ isOpen, onClose, onSubmitPost, onTrigg
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           
-          {/* Author Emotional Tag Selector */}
-          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto no-scrollbar p-1">
+          {/* Author Emotional Tag Selector - scrollable with max-height */}
+          <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto no-scrollbar p-1 rounded-xl bg-slate-950/30 border border-slate-800/50">
             {EMOTIONAL_TAGS.filter((t) => t.id !== "all").map((tag) => {
               const isSelected = selectedTagId === tag.id;
               return (

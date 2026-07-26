@@ -14,6 +14,10 @@ const PROFANITY_PATTERNS = [
   // Clean regex rules for blatant toxic abuse without false positives on legitimate emotional expression
 ];
 
+// English/Latin characters and URL patterns — blocked to prevent link injection
+const LATIN_PATTERN = /[a-zA-Z]{4,}/; // Blocks any 4+ consecutive Latin chars
+const URL_PATTERN = /https?:\/\/|www\.|\.[a-zA-Z]{2,}(\/|\s|$)/;
+
 export function checkSafety(text) {
   if (!text || typeof text !== "string") {
     return { isSafe: true, isSelfHarm: false };
@@ -40,6 +44,26 @@ export function checkSafety(text) {
       isSafe: false,
       isSelfHarm: false,
       reason: "يحتوي النص على كلمات غير ملائمة لبيئة البوح الدافئة والسلامة المتبادلة."
+    };
+  }
+
+  // 3. Check for Latin/English characters (prevents link injection)
+  const containsLatin = LATIN_PATTERN.test(text);
+  if (containsLatin) {
+    return {
+      isSafe: false,
+      isSelfHarm: false,
+      reason: "النص يحتوي على أحرف لاتينية. يُسمح فقط بالكتابة بالعربية حفاظاً على خصوصية وبيئة البوح."
+    };
+  }
+
+  // 4. Check for URLs
+  const containsURL = URL_PATTERN.test(text);
+  if (containsURL) {
+    return {
+      isSafe: false,
+      isSelfHarm: false,
+      reason: "النص يحتوي على رابط. لا يُسمح بإدراج روابط حفاظاً على سلامة المجتمع."
     };
   }
 

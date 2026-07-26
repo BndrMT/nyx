@@ -181,7 +181,7 @@ export default function App() {
               <div className="flex flex-row items-center justify-between sm:justify-end gap-2 text-[10px] text-slate-400 pt-1 border-t border-white/5 w-full">
                 <span className="flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  مستور ومجهول 100%
+                  سري
                 </span>
                 <span className="flex items-center gap-1">
                   <Heart className="w-3 h-3 text-purple-400" />
