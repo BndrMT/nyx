@@ -155,7 +155,7 @@ export async function fetchAndSeedDailyVents() {
           saveNewPost({
             content: post.content.trim(),
             tagId: inferTag(post.content),
-            retentionDays: 7
+            retentionDays: 0 // للابد
           });
           seeded = true;
         }
@@ -170,7 +170,7 @@ export async function fetchAndSeedDailyVents() {
         saveNewPost({
           content: chosen.content.trim(),
           tagId: chosen.tagId,
-          retentionDays: 7
+          retentionDays: 0 // للابد
         });
       }
     }
