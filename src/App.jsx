@@ -13,7 +13,7 @@ import Footer from "./components/Footer";
 
 import { getStoredPosts, saveNewPost, togglePostReaction, getUserReactions, getOrCreateDeviceUUID, deleteMyPost } from "./utils/storage";
 import { registerServiceWorker } from "./utils/pwa";
-import { fetchAndSeedDailyVents } from "./utils/dailyFetcher";
+import { fetchAndSeedDailyVents } from "./utils/dailySeeder";
 import { Heart, Sparkles, ShieldCheck, PenTool, Wind, Moon, RefreshCw } from "lucide-react";
 
 const BATCH_SIZE = 6;

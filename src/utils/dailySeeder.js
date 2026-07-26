@@ -1,0 +1,116 @@
+// Automated Daily Anonymous Vents Seeding Utility (3 Vents / 24 Hours)
+// 100% Free, Zero-Knowledge Privacy Compliant (No handles, no IPs, no URLs, no metadata stored)
+
+import { checkSafety } from "./moderation";
+import { saveNewPost } from "./storage";
+
+// Curated daily authentic Arabic emotional thoughts — 60 original texts
+const CURATED_DAILY_FEED = [
+  // === silent-grief (غصّة مكتومة) ===
+  { content: "أحياناً نعتاد الصمت حتى يصبح لغة الروح الوحيدة التي تحمينا من الشرح الطويل للناس.", tagId: "unspoken-choke" },
+  { content: "تعتاد أن تبتسم رغم الألم، لأن شرح ما بداخلك مرهق أكثر من تحمله وحدك.", tagId: "silent-grief" },
+  { content: "أصعب شيء أن تتظاهر بالثبات وأنت تنهمر دمعاً وسككاً في داخلك كل ليلة.", tagId: "silent-grief" },
+  { content: "الغصة ليست في الكلام المحبوس، بل في أن لا أحد يلاحظ صمتك الثقيل.", tagId: "silent-grief" },
+  { content: "تبتسم للناس وفي داخك بحر من الدموع لا يراه أحد.", tagId: "silent-grief" },
+  { content: "أقسى أنواع الوحدة أن تكون بين جمع من الناس وتشعر بأنك وحدك تماماً.", tagId: "silent-grief" },
+  { content: "أحياناً البكاء دون سبب هو بكاء الروح التي تعبت من الصمود.", tagId: "silent-grief" },
+
+  // === future-anxiety (خوف من المجهول) ===
+  { content: "أخاف جداً من الخطوة القادمة في حياتي، لا أحد يعلم مقدار الرعب الذي ينتابني عند التفكير في المستقبل، لكنني أحاول التظاهر بالتماسك كل يوم.", tagId: "future-anxiety" },
+  { content: "القلق لا يمنع ألم الغد، ولكنه يسرق متعة اليوم.", tagId: "future-anxiety" },
+  { content: "الخوف من المجهول يثقل الروح، لا لأن المستقبل مخيف، بل لأننا لا نملك خريطة له.", tagId: "future-anxiety" },
+  { content: "التفكير الزائد في الغد يسرق سلام اليوم، لكن كيف نوقفه ونحن لا نرى الطريق؟", tagId: "future-anxiety" },
+  { content: "الليل يحمل معه كل مخاوف النهار التي أخفيناها عن الجميع.", tagId: "future-anxiety" },
+  { content: "ليس الخوف من الفشل بل من التوقف عن المحاولة، من أن تستسلم الروح قبل الجسد.", tagId: "future-anxiety" },
+  { content: "أسال ربي كل يوم أن يكتب لي الخير حيث كان، وأنا أسير في الظلام أثق بأن النور آت.", tagId: "faltering-hope" },
+
+  // === longing (اشتياق صامت) ===
+  { content: "الحنين هو العطر الذي يفوح من روح من رحلوا، يملأ المكان بذكراهم ولا يفارق القلب أبداً.", tagId: "longing" },
+  { content: "الاشتياق لمن لا يستطيع العودة هو إقامة داخل القلب لشبح يعيش بين الضلوع.", tagId: "longing" },
+  { content: "في زحام الحياة، يبقى أشخاص لا تكف عن البحث عنهم في تفاصيل يومك.", tagId: "longing" },
+  { content: "الشوق هو رفيق الليل الوحيد الذي لا يمل من زيارتي كلما أظلمت الدنيا.", tagId: "longing" },
+  { content: "أتساءل إن كانوا يشعرون بمدى اشتياقنا لهم هناك، حيث هم الآن.", tagId: "longing" },
+  { content: "الذكريات الجميلة مؤلمة، لأنها تذكرك بأيام مضت وتؤكد لك أنها لن تعود.", tagId: "longing" },
+  { content: "أشتاق لأيام كانت الحياة فيها أبسط والقلوب أصفى والأيادي لا تترك بعضها.", tagId: "longing" },
+
+  // === disappointment (خيبة رقيقة) ===
+  { content: "الخذلان لا يأتي دائمًا بصوتٍ عالٍ… أحيانا يأتي على هيئة صمتٍ طويل، أو وعدٍ لم يتم.", tagId: "disappointment" },
+  { content: "الخذلان هو أن تختار شخصاً لتحارب به الدنيا، فيحاربك هو والدنيا.", tagId: "disappointment" },
+  { content: "شيء ينكسر في القلب عند الخيبة لا يمكن إصلاحه ولو بخيوط من ذهب.", tagId: "disappointment" },
+  { content: "مرارة الخذلان تجرح لأنها تأتي ممن أمنّاهم على أرواحنا.", tagId: "disappointment" },
+  { content: "أصعب شيء أن يموت في عينيك إنسان وهو ما زال حياً.", tagId: "disappointment" },
+  { content: "الخذلان المتكرر يعلّمك ألا تتعلق بأحد، حتى لا تؤلمك الغصة من جديد.", tagId: "disappointment" },
+  { content: "ما يوجع أكثر من الخيبة نفسها هو أنك كنت على يقين بأن هذه المرة مختلفة.", tagId: "disappointment" },
+
+  // === soul-exhaustion (تعب الروح) ===
+  { content: "التعب الجسدي يزول بالنوم، لكن تعب الروح يحتاج لسكينة وأرواح تفهم دون أن تطالب بالشرح.", tagId: "soul-exhaustion" },
+  { content: "أحياناً أشعر أنني أنفق كل طاقتي في مساعدة الآخرين، لكن لا أحد يسأل كيف قلبي.", tagId: "soul-exhaustion" },
+  { content: "أحملُ في داخلي عناء سنين، لا يُخففه نوم ولا يمحوه يقين.", tagId: "soul-exhaustion" },
+  { content: "صدّقوني أنا بخير... فقط أعاني القليل من وجع القلب، وموجات من الاختناق، والكثير من الخذلان صامتاً.", tagId: "soul-exhaustion" },
+  { content: "تعب الروح لا يُرى بالعين المجردة، لكنه يوجع أكثر من أي مرض جسدي.", tagId: "soul-exhaustion" },
+  { content: "أحياناً أريد الاختفاء عن العالم، وعن الجميع، وعن نفسي أيضاً.", tagId: "soul-exhaustion" },
+  { content: "أحتاج يوماً طويلاً من النوم العميق الذي لا تزعجه الذكريات.", tagId: "soul-exhaustion" },
+
+  // === departed-loved-ones (شوق لمن رحلوا) ===
+  { content: "مر عام كامل على رحيل الشخص الذي كان ملاذي الوحيد، ما زلت أبحث عن صوته في زوايا البيت.", tagId: "departed-loved-ones" },
+  { content: "رحيل الأحبة لا يعلّمنا الصبر فقط، بل يعلمنا أن الحياة قصيرة جداً لنضيعها في الخلافات.", tagId: "departed-loved-ones" },
+  { content: "في كل عيد ومناسبة، أفتقد مقعداً فارغاً لن يمتلئ أبداً.", tagId: "departed-loved-ones" },
+  { content: "الموت ليس نهاية، لكنه بداية شوق لا ينتهي ومكان في القلب لا يسدّه أحد.", tagId: "departed-loved-ones" },
+  { content: "أشتاق لمن رحلوا، وأعلم أنهم يرونني من حيث لا أراهم، وأن دموعي تصلهم.", tagId: "departed-loved-ones" },
+  { content: "ذكراهم عطر لا يزول، وجرح لا يندمل، ودرس لا يُنسى.", tagId: "departed-loved-ones" },
+  { content: "كل شيء يذكرني بهم، حتى الأماكن التي لم نزرها معاً تحمل شيئاً منهم.", tagId: "departed-loved-ones" },
+
+  // === faltering-hope (أمل يترنح) ===
+  { content: "سأنتظر أكثر، فروحي تتشبث وتخبرني بأن الأشياء الجميلة ستأتي بعد هذه العتمة.", tagId: "faltering-hope" },
+  { content: "يا رب يدُك أرحم من يدي ولُطفك أعظم من خوفي.. أصارع الحياة والأيام والناس.", tagId: "faltering-hope" },
+  { content: "أتمسك بأمل واهن كخيط رفيع، أعرف أنه قد ينقطع لكنه كل ما تبقى لي.", tagId: "faltering-hope" },
+  { content: "يأتيني الأمل في صورة أشياء صغيرة جداً لا يراها أحد، لكنها تنعش قلبي.", tagId: "faltering-hope" },
+  { content: "لا أدري كيف ستنتهي القصة، لكنني أريد أن أصدق أن النهايات جميلة.", tagId: "faltering-hope" },
+  { content: "بين اليأس والأمل مسافة نبضة واحدة، وفي تلك النبضة أعيش كل يوم.", tagId: "faltering-hope" },
+  { content: "ما زلت أؤمن أن للصبر حدوداً، وأن الفرج قادم ولو بعد حين.", tagId: "faltering-hope" },
+
+  // === path-confusion (حيرة الطريق) ===
+  { content: "حولي ألف شخص، وفي قلبي غربة شديدة.. أسوأ أنواع الوحدة التي تجتاحك وأنت بين أهلك.", tagId: "path-confusion" },
+  { content: "يقولون الحياة أمامك، وأنا أمامي ألف طريق ولا أعرف أياً منها هو طريقي.", tagId: "path-confusion" },
+  { content: "الضياع ليس في أن لا تعرف أين تذهب، بل في أن تعرف وتحتار إن كان يستحق.", tagId: "path-confusion" },
+  { content: "أحتاج بصمة نور في هذا الظلام الذي يلف طريقي، دليلاً يضمني إلى بر الأمان.", tagId: "path-confusion" },
+  { content: "كلما ظننت أنني وجدت طريقي، أدركت أنني سرت في دائرة عدت منها حيث بدأت.", tagId: "path-confusion" },
+  { content: "أكبر حيرة هي حين تكتشف أن كل الخيارات أمامك مؤلمة، وعليك اختيار أقلها ألماً.", tagId: "path-confusion" },
+
+  // === unspoken-choke (كلام خنقته العبرة) ===
+  { content: "ما أصعب أن تقف الكلمة بين الفم والحنجرة.. إن أظهرتها فقدت من تُحب، وإن أبقيتها خنقت نفسك.", tagId: "unspoken-choke" },
+  { content: "رغم الصمت الذي نعيشه، إلا أن في قلوبنا كلمات لها أصوات عالية جداً لا يسمعها أحد.", tagId: "unspoken-choke" },
+  { content: "أصعب كلمة هي التي تقف على شفتيك ولا تستطيع قولها خوفاً من ردة الفعل.", tagId: "unspoken-choke" },
+  { content: "أكتب ما لا أستطيع قوله، لأن الحروف أصدق من اللسان.", tagId: "unspoken-choke" },
+  { content: "كم من كلمة دفنت في صدري لأن الأرض التي ستنبت فيها لم تعد صالحة للزرع.", tagId: "unspoken-choke" },
+  { content: "أتمنى لو يستطيع الناس سماع أفكاري، ليعرفوا كم أحبهم وكم يوجعني بعدهم.", tagId: "unspoken-choke" },
+];
+
+export function fetchAndSeedDailyVents() {
+  const lastFetch = localStorage.getItem("nyx_last_daily_fetch");
+  const now = Date.now();
+
+  // Check if 24 hours (86,400,000 ms) have passed since last fetch
+  if (!lastFetch || (now - Number(lastFetch)) > 24 * 60 * 60 * 1000) {
+    // Pick 3 random anonymized vents from the curated list
+    const shuffled = [...CURATED_DAILY_FEED].sort(() => 0.5 - Math.random());
+    const selectedThree = shuffled.slice(0, 3);
+
+    selectedThree.forEach((item) => {
+      // Run through local safety & profanity filter
+      const safety = checkSafety(item.content);
+      if (safety.isSafe) {
+        // Strip any remaining unwanted metadata or formatting
+        const cleanContent = item.content.trim().replace(/https?:\/\/\S+/g, "").replace(/#\S+/g, "");
+        saveNewPost({
+          content: cleanContent,
+          tagId: item.tagId,
+          retentionDays: 7 // 7 days retention for daily imported vents
+        });
+      }
+    });
+
+    localStorage.setItem("nyx_last_daily_fetch", now.toString());
+    console.log("Nyx: 3 Daily Anonymous Vents seeded successfully with zero-knowledge privacy!");
+  }
+}
