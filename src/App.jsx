@@ -41,13 +41,21 @@ export default function App() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [selectedPostForShare, setSelectedPostForShare] = useState(null);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
 
   useEffect(() => {
     getOrCreateDeviceUUID();
     registerServiceWorker();
 
-    // Trigger daily automated 3-vents seeding with zero-knowledge privacy
+    // Trigger daily automated seeding
     fetchAndSeedDailyVents();
+
+    // Show welcome modal on first visit (once)
+    const welcomed = localStorage.getItem("nyx_welcomed_v1");
+    if (!welcomed) {
+      setIsFirstVisit(true);
+      setIsAboutOpen(true);
+    }
 
     setPosts(getStoredPosts());
     setUserReactions(getUserReactions());
@@ -306,7 +314,13 @@ export default function App() {
       {/* About Modal */}
       <AboutModal
         isOpen={isAboutOpen}
-        onClose={() => setIsAboutOpen(false)}
+        onClose={() => {
+          setIsAboutOpen(false);
+          if (isFirstVisit) {
+            localStorage.setItem("nyx_welcomed_v1", "true");
+            setIsFirstVisit(false);
+          }
+        }}
       />
 
       {/* Footer */}
