@@ -172,6 +172,8 @@ export async function fetchAndSeedDailyVents() {
           tagId: chosen.tagId,
           retentionDays: 0 // للابد
         });
+        // Also seed to shared API
+        postToApi(chosen.content.trim(), chosen.tagId);
       }
     }
 
@@ -228,6 +230,21 @@ function seedReactions() {
     localStorage.setItem(LOCAL_POSTS_KEY, JSON.stringify(posts));
   } catch (_e) {
     // صامت — لا نريد أن نعطل التطبيق
+  }
+}
+
+/**
+ * نشر بوح إلى الـ API المشترك (متزامن مع جميع المستخدمين)
+ */
+async function postToApi(content, tagId) {
+  try {
+    await fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, tagId, deviceUUID: "nyx_daily_seeder" })
+    });
+  } catch (_e) {
+    // صامت — لا يمنع التطبيق
   }
 }
 

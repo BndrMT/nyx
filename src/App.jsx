@@ -15,9 +15,25 @@ import AboutModal from "./components/AboutModal";
 import { getStoredPosts, saveNewPost, togglePostReaction, getUserReactions, getOrCreateDeviceUUID, deleteMyPost } from "./utils/storage";
 import { registerServiceWorker } from "./utils/pwa";
 import { fetchAndSeedDailyVents } from "./utils/dailySeeder";
+import { fetchPosts as fetchApiPosts } from "./utils/api";
 import { Heart, Sparkles, ShieldCheck, PenTool, Wind, Moon, RefreshCw } from "lucide-react";
+import { getOrCreateDeviceUUID as getDeviceUUID } from "./utils/storage";
+import { createPost as apiCreatePost, addReaction as apiAddReaction } from "./utils/api";
 
 const BATCH_SIZE = 6;
+
+// Normalize API post format to app format
+function normalizePost(p) {
+  return {
+    id: p.id,
+    tagId: p.tag_id || "silent-grief",
+    content: p.content,
+    createdAt: p.created_at,
+    reactions: typeof p.reactions === "string" ? JSON.parse(p.reactions) : (p.reactions || {}),
+    device_uuid: p.device_uuid,
+    quote: ""
+  };
+}
 
 export default function App() {
   const [posts, setPosts] = useState([]);
@@ -57,8 +73,22 @@ export default function App() {
       setIsAboutOpen(true);
     }
 
-    setPosts(getStoredPosts());
-    setUserReactions(getUserReactions());
+    // Fetch shared posts from API, fallback to localStorage
+    fetchApiPosts()
+      .then((apiPosts) => {
+        const localPosts = getStoredPosts();
+        // Merge: API posts + user's own local posts (by ID dedup)
+        const apiIds = new Set(apiPosts.map((p) => p.id));
+        const uniqueLocal = localPosts.filter((p) => !apiIds.has(p.id));
+        const merged = [...apiPosts.map(normalizePost), ...uniqueLocal];
+        merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setPosts(merged);
+      })
+      .catch(() => {
+        // Fallback to local only
+        setPosts(getStoredPosts());
+        setUserReactions(getUserReactions());
+      });
   }, []);
 
   useEffect(() => {
@@ -96,12 +126,27 @@ export default function App() {
     }, 400);
   };
 
-  const handleCreatePost = (newPostData) => {
-    const updated = saveNewPost(newPostData);
-    setPosts(updated);
+  const handleCreatePost = async (newPostData) => {
+    // Post to shared API
+    try {
+      const uuid = getDeviceUUID();
+      const newId = await apiCreatePost(newPostData.content, newPostData.tagId, uuid);
+      // Also save locally for "my posts" feature
+      const updated = saveNewPost({ ...newPostData, id: newId });
+      setPosts(updated);
+    } catch {
+      // Fallback: local only
+      const updated = saveNewPost(newPostData);
+      setPosts(updated);
+    }
   };
 
-  const handleToggleReaction = (postId, reactionId) => {
+  const handleToggleReaction = async (postId, reactionId) => {
+    // Try API first
+    try {
+      await apiAddReaction(postId, reactionId);
+    } catch { /* silent — fallback to local */ }
+    // Update UI immediately (optimistic)
     const res = togglePostReaction(postId, reactionId);
     setPosts(res.posts);
     setUserReactions(res.userReactions);
