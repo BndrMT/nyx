@@ -8,6 +8,7 @@ import AIAnalysisModal from "./components/AIAnalysisModal";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import MyPostsModal from "./components/MyPostsModal";
 import BreathingModal from "./components/BreathingModal";
+import ShareCardModal from "./components/ShareCardModal";
 import Footer from "./components/Footer";
 
 import { getStoredPosts, saveNewPost, togglePostReaction, getUserReactions, getOrCreateDeviceUUID, deleteMyPost } from "./utils/storage";
@@ -35,6 +36,8 @@ export default function App() {
   const [isPWAInstallOpen, setIsPWAInstallOpen] = useState(false);
   const [isMyPostsOpen, setIsMyPostsOpen] = useState(false);
   const [isBreathingOpen, setIsBreathingOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [selectedPostForShare, setSelectedPostForShare] = useState(null);
 
   useEffect(() => {
     getOrCreateDeviceUUID();
@@ -43,12 +46,10 @@ export default function App() {
     setUserReactions(getUserReactions());
   }, []);
 
-  // Reset pagination count when active tag changes
   useEffect(() => {
     setDisplayedCount(BATCH_SIZE);
   }, [activeTag]);
 
-  // Infinite Scroll Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -106,6 +107,11 @@ export default function App() {
     setIsAIOpen(true);
   };
 
+  const handleOpenShareCard = (post) => {
+    setSelectedPostForShare(post);
+    setIsShareOpen(true);
+  };
+
   const handleTriggerSOS = (reason) => {
     setSosReason(reason);
     setIsSOSOpen(true);
@@ -143,7 +149,7 @@ export default function App() {
               </h2>
             </div>
 
-            {/* Hero Controls: "تنفس بعمق" & "بوح جديد" */}
+            {/* Hero Controls */}
             <div className="flex flex-col items-center sm:items-end gap-3 w-full sm:w-auto">
               
               {/* Action Buttons */}
@@ -189,7 +195,7 @@ export default function App() {
         {/* Emotion Tag Filters */}
         <FilterBar activeTag={activeTag} onSelectTag={setActiveTag} />
 
-        {/* Posts Silent Feed (Batch Loaded / Infinite Scroll) */}
+        {/* Posts Silent Feed */}
         <section className="space-y-4">
           {filteredPosts.length === 0 ? (
             <div className="py-16 text-center rounded-3xl bg-slate-900/40 border border-slate-800 p-8">
@@ -211,10 +217,11 @@ export default function App() {
                   post={post}
                   userReactions={userReactions}
                   onToggleReaction={handleToggleReaction}
+                  onShare={handleOpenShareCard}
                 />
               ))}
 
-              {/* Infinite Scroll Load Trigger & Spinner */}
+              {/* Infinite Scroll Trigger */}
               {hasMore && (
                 <div ref={loadMoreRef} className="pt-6 pb-2 text-center">
                   <button
@@ -273,11 +280,18 @@ export default function App() {
         onDeletePost={handleDeletePost}
         onUpdateRetention={handleUpdateRetention}
         onAnalyzeAI={handleOpenAIAnalysis}
+        onShare={handleOpenShareCard}
       />
 
       <BreathingModal
         isOpen={isBreathingOpen}
         onClose={() => setIsBreathingOpen(false)}
+      />
+
+      <ShareCardModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        post={selectedPostForShare}
       />
 
       {/* Footer */}

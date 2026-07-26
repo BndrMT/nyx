@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Flame, X, Trash2, Moon, ShieldCheck, Heart, Clock, Sparkles } from "lucide-react";
+import { Flame, X, Trash2, Moon, ShieldCheck, Heart, Clock, Sparkles, Share2 } from "lucide-react";
 import { getMySentPosts, deleteMyPost, updatePostRetention } from "../utils/storage";
 import { EMOTIONAL_TAGS } from "../data/tags";
 
-export default function MyPostsModal({ isOpen, onClose, onDeletePost, onUpdateRetention, onAnalyzeAI }) {
+export default function MyPostsModal({ isOpen, onClose, onDeletePost, onUpdateRetention, onAnalyzeAI, onShare }) {
   const [myPosts, setMyPosts] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -89,17 +89,25 @@ export default function MyPostsModal({ isOpen, onClose, onDeletePost, onUpdateRe
                       <span>{tag.name}</span>
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-500">
-                        {new Date(post.createdAt).toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
-                      </span>
+                      <button
+                        onClick={() => {
+                          onClose();
+                          if (onShare) onShare(post);
+                        }}
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 text-[10px] text-slate-300 hover:text-white transition-all"
+                        title="مشاركة هذه الهمسة كبطاقة"
+                      >
+                        <Share2 className="w-3 h-3 text-purple-400" />
+                        <span>مشاركة</span>
+                      </button>
                       <button
                         onClick={() => handleDeleteWithBurnEffect(post.id)}
                         disabled={isDeletingThis}
-                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-rose-400/90 hover:text-rose-200 hover:bg-rose-950/60 border border-rose-900/40 text-[10px] transition-all"
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-rose-400/90 hover:text-rose-200 hover:bg-rose-950/60 border border-rose-900/40 text-[10px] transition-all"
                         title="احتراق وتلاشي هذه الهمسة"
                       >
                         <Trash2 className="w-3 h-3" />
-                        <span>تلاشي الهمسة</span>
+                        <span>تلاشي</span>
                       </button>
                     </div>
                   </div>
@@ -108,11 +116,11 @@ export default function MyPostsModal({ isOpen, onClose, onDeletePost, onUpdateRe
                     {post.content}
                   </p>
 
-                  {/* Retention Selector for this specific vent */}
+                  {/* Retention Selector */}
                   <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between gap-2 text-[11px]">
                     <span className="text-slate-400 flex items-center gap-1 font-medium">
                       <Clock className="w-3.5 h-3.5 text-amber-400" />
-                      مدة بقاء الهمسة:
+                      مدة البقاء:
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {RETENTION_OPTIONS.map((opt) => (
@@ -131,7 +139,7 @@ export default function MyPostsModal({ isOpen, onClose, onDeletePost, onUpdateRe
                     </div>
                   </div>
 
-                  {/* Reaction Count & AI Analysis Button inside My Posts card */}
+                  {/* Reaction Count & AI Analysis Button */}
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
                     <span className="flex items-center gap-1 text-purple-300">
                       <Heart className="w-3.5 h-3.5 text-purple-400" />

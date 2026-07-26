@@ -1,10 +1,10 @@
 import React from "react";
-import { Clock, Moon, Heart } from "lucide-react";
+import { Clock, Moon, Heart, Share2 } from "lucide-react";
 import { EMOTIONAL_TAGS } from "../data/tags";
 import { EMPATHETIC_REACTIONS } from "../data/reactions";
 import confetti from "canvas-confetti";
 
-export default function PostCard({ post, userReactions, onToggleReaction }) {
+export default function PostCard({ post, userReactions, onToggleReaction, onShare }) {
   const tag = EMOTIONAL_TAGS.find((t) => t.id === post.tagId) || EMOTIONAL_TAGS[0];
   const postUserReactions = userReactions[post.id] || {};
 
@@ -92,10 +92,21 @@ export default function PostCard({ post, userReactions, onToggleReaction }) {
           </span>
         </div>
 
-        {/* Timestamp */}
+        {/* Share & Timestamp */}
         <div className="flex items-center gap-2 text-[11px] text-slate-500">
-          <Clock className="w-3 h-3" />
-          <span>{formatRelativeTime(post.createdAt)}</span>
+          <button
+            onClick={() => onShare && onShare(post)}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-purple-300 hover:border-purple-500/40 transition-all"
+            title="مشاركة البطاقة كصورة"
+          >
+            <Share2 className="w-3 h-3" />
+            <span>مشاركة</span>
+          </button>
+
+          <div className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            <span>{formatRelativeTime(post.createdAt)}</span>
+          </div>
         </div>
       </div>
 
