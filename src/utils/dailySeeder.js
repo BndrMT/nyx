@@ -1,10 +1,15 @@
 // Automated Daily Anonymous Vents Seeding Utility (3 Vents / 24 Hours)
-// 100% Free, Zero-Knowledge Privacy Compliant (No handles, no IPs, no URLs, no metadata stored)
+// 100% Free, Zero-Knowledge Privacy Compliant
+// Primary source: Reddit API via Vercel proxy (real user content)
+// Fallback: Curated Arabic emotional texts
 
 import { checkSafety } from "./moderation";
 import { saveNewPost } from "./storage";
 
-// Curated daily authentic Arabic emotional thoughts — 60 original texts
+// ====== API ENDPOINT ======
+const REDDIT_API = "/api/reddit-proxy";
+
+// ====== FALLBACK CURATED FEED (60 texts) ======
 const CURATED_DAILY_FEED = [
   // === silent-grief (غصّة مكتومة) ===
   { content: "أحياناً نعتاد الصمت حتى يصبح لغة الروح الوحيدة التي تحمينا من الشرح الطويل للناس.", tagId: "unspoken-choke" },
@@ -86,31 +91,72 @@ const CURATED_DAILY_FEED = [
   { content: "أتمنى لو يستطيع الناس سماع أفكاري، ليعرفوا كم أحبهم وكم يوجعني بعدهم.", tagId: "unspoken-choke" },
 ];
 
-export function fetchAndSeedDailyVents() {
+export async function fetchAndSeedDailyVents() {
   const lastFetch = localStorage.getItem("nyx_last_daily_fetch");
   const now = Date.now();
 
-  // Check if 24 hours (86,400,000 ms) have passed since last fetch
+  // Check if 24 hours have passed
   if (!lastFetch || (now - Number(lastFetch)) > 24 * 60 * 60 * 1000) {
-    // Pick 3 random anonymized vents from the curated list
-    const shuffled = [...CURATED_DAILY_FEED].sort(() => 0.5 - Math.random());
-    const selectedThree = shuffled.slice(0, 3);
-
-    selectedThree.forEach((item) => {
-      // Run through local safety & profanity filter
-      const safety = checkSafety(item.content);
-      if (safety.isSafe) {
-        // Strip any remaining unwanted metadata or formatting
-        const cleanContent = item.content.trim().replace(/https?:\/\/\S+/g, "").replace(/#\S+/g, "");
-        saveNewPost({
-          content: cleanContent,
-          tagId: item.tagId,
-          retentionDays: 7 // 7 days retention for daily imported vents
-        });
+    
+    // Try Reddit API first
+    let seeded = false;
+    try {
+      const response = await fetch(REDDIT_API);
+      const data = await response.json();
+      
+      if (data.success && data.posts && data.posts.length > 0) {
+        for (const post of data.posts) {
+          const safety = checkSafety(post.content);
+          if (safety.isSafe) {
+            saveNewPost({
+              content: post.content.trim(),
+              tagId: inferTag(post.content),
+              retentionDays: 7
+            });
+          }
+        }
+        seeded = true;
+        console.log("Nyx: 3 Reddit vents seeded successfully! (zero-knowledge)");
       }
-    });
+    } catch (err) {
+      console.log("Nyx: Reddit API unavailable, using curated fallback.");
+    }
+
+    // Fallback: curated list
+    if (!seeded) {
+      const shuffled = [...CURATED_DAILY_FEED].sort(() => 0.5 - Math.random());
+      const selectedThree = shuffled.slice(0, 3);
+
+      selectedThree.forEach((item) => {
+        const safety = checkSafety(item.content);
+        if (safety.isSafe) {
+          const cleanContent = item.content.trim().replace(/https?:\/\/\S+/g, "").replace(/#\S+/g, "");
+          saveNewPost({
+            content: cleanContent,
+            tagId: item.tagId,
+            retentionDays: 7
+          });
+        }
+      });
+      console.log("Nyx: 3 curated vents seeded (fallback mode).");
+    }
 
     localStorage.setItem("nyx_last_daily_fetch", now.toString());
-    console.log("Nyx: 3 Daily Anonymous Vents seeded successfully with zero-knowledge privacy!");
   }
+}
+
+// Infer emotional tag from text content
+function inferTag(text) {
+  const lower = text.toLowerCase();
+  if (lower.includes("خوف") || lower.includes("مستقبل") || lower.includes("قلق") || lower.includes("مجهول")) return "future-anxiety";
+  if (lower.includes("غص") || lower.includes("غصة") || lower.includes("بكاء") || lower.includes("دموع")) return "silent-grief";
+  if (lower.includes("خذلان") || lower.includes("خيبة") || lower.includes("غدر") || lower.includes("خان")) return "disappointment";
+  if (lower.includes("اشتياق") || lower.includes("حنين") || lower.includes("شوق") || lower.includes("نشتاق")) return "longing";
+  if (lower.includes("تعب") || lower.includes("إرهاق") || lower.includes("منهك") || lower.includes("مرهق")) return "soul-exhaustion";
+  if (lower.includes("رحل") || lower.includes("مات") || lower.includes("فقد") || lower.includes("توفي") || lower.includes("غاب")) return "departed-loved-ones";
+  if (lower.includes("أمل") || lower.includes("صبر") || lower.includes("انتظار") || lower.includes("فرج")) return "faltering-hope";
+  if (lower.includes("حيرة") || lower.includes("ضياع") || lower.includes("طريق") || lower.includes("غربة")) return "path-confusion";
+  if (lower.includes("صمت") || lower.includes("كلام") || lower.includes("كلمة") || lower.includes("عجز")) return "unspoken-choke";
+  // Default: silent-grief (most common emotional tag)
+  return "silent-grief";
 }
