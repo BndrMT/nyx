@@ -51,7 +51,6 @@ export default function BreathingModal({ isOpen, onClose }) {
   // Session timer countdown
   useEffect(() => {
     if (!isOpen || timeLeft <= 0) return;
-    const isTimerRunning = timeLeft > 0;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -64,7 +63,7 @@ export default function BreathingModal({ isOpen, onClose }) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isOpen, isTimerRunning]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, timeLeft]);
 
   if (!isOpen) return null;
 

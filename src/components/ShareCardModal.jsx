@@ -1,18 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Share2, Copy, Check, Moon, Image as ImageIcon } from "lucide-react";
 import { EMOTIONAL_TAGS } from "../data/tags";
 import { EMPATHETIC_REACTIONS } from "../data/reactions";
+import QRCode from "qrcode";
 
 export default function ShareCardModal({ isOpen, onClose, post }) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState("");
+
+  useEffect(() => {
+    if (isOpen && post) {
+      QRCode.toDataURL(window.location.origin, {
+        width: 80,
+        margin: 1,
+        color: { dark: "#A855F7", light: "#0B0D14" }
+      }).then(setQrDataUrl).catch(() => {});
+    }
+  }, [isOpen, post]);
 
   if (!isOpen || !post) return null;
 
   const tag = EMOTIONAL_TAGS.find((t) => t.id === post.tagId) || EMOTIONAL_TAGS[0];
 
-  // HTML5 Canvas Generator with Dynamic Text Height & Multi-row Wrapping Reaction Badges
-  const handleDownloadImage = () => {
+  // HTML5 Canvas Generator with Dynamic Text Height & Multi-row Wrapping Reaction Badges + Real QR Code
+  const handleDownloadImage = async () => {
     setDownloading(true);
     try {
       const canvas = document.createElement("canvas");
@@ -153,25 +165,34 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
       ctx.font = "22px system-ui, Cairo, sans-serif";
       ctx.fillText("نَهْرُ النِّسْيَانِ وَالْخَلاصِ", 980, 1005);
 
-      // Aesthetic QR Code Box
+      // Real QR Code — draw to off-screen canvas then onto the card
       const qrSize = 100;
       const qrX = 100;
       const qrY = 930;
 
+      const qrCanvas = document.createElement("canvas");
+      qrCanvas.width = qrSize;
+      qrCanvas.height = qrSize;
+      await QRCode.toCanvas(qrCanvas, window.location.origin, {
+        width: qrSize,
+        margin: 2,
+        color: {
+          dark: "#A855F7",
+          light: "#0B0D14"
+        }
+      });
+
+      // Draw rounded background for QR
       ctx.fillStyle = "#0B0D14";
       ctx.beginPath();
-      ctx.roundRect(qrX, qrY, qrSize, qrSize, 12);
+      ctx.roundRect(qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 12);
       ctx.fill();
       ctx.strokeStyle = "rgba(168, 85, 247, 0.6)";
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      ctx.fillStyle = "#A855F7";
-      ctx.fillRect(qrX + 15, qrY + 15, 25, 25);
-      ctx.fillRect(qrX + 60, qrY + 15, 25, 25);
-      ctx.fillRect(qrX + 15, qrY + 60, 25, 25);
-      ctx.fillStyle = "#E9D5FF";
-      ctx.fillRect(qrX + 48, qrY + 48, 14, 14);
+      // Draw the real QR code
+      ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
 
       // Trigger PNG File Download or Native Share
       canvas.toBlob((blob) => {
@@ -281,9 +302,13 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
                 </div>
               </div>
 
-              {/* Aesthetic QR Code Box */}
-              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-purple-500/40 p-1 flex items-center justify-center text-[9px] text-purple-300 text-center font-mono shadow-inner">
-                [QR]
+              {/* Real QR Code */}
+              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-purple-500/40 p-1 flex items-center justify-center shadow-inner">
+                {qrDataUrl ? (
+                  <img src={qrDataUrl} alt="QR" className="w-full h-full" />
+                ) : (
+                  <span className="text-[8px] text-purple-300 font-mono">QR</span>
+                )}
               </div>
             </div>
 

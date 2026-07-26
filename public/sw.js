@@ -10,7 +10,10 @@ const ASSETS = [
   "/fonts/tajawal-300.woff2",
   "/fonts/tajawal-400.woff2",
   "/fonts/tajawal-500.woff2",
-  "/fonts/tajawal-700.woff2"
+  "/fonts/tajawal-700.woff2",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/icon-512-maskable.png"
 ];
 
 self.addEventListener("install", (event) => {
