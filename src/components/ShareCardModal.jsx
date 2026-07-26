@@ -11,7 +11,7 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
 
   const tag = EMOTIONAL_TAGS.find((t) => t.id === post.tagId) || EMOTIONAL_TAGS[0];
 
-  // HTML5 Canvas Generator with Reaction Icons/Counts & QR Code Space
+  // HTML5 Canvas Generator with Dynamic Text Height & Multi-row Wrapping Reaction Badges
   const handleDownloadImage = () => {
     setDownloading(true);
     try {
@@ -42,26 +42,38 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
       ctx.textAlign = "right";
       ctx.fillText(`${tag.icon} ${tag.name}`, 980, 120);
 
-      // Nyx Badge
+      // Nyx Subtitle Badge
       ctx.fillStyle = "rgba(216, 180, 254, 0.8)";
       ctx.font = "24px system-ui, Cairo, sans-serif";
-      ctx.fillText("تحت سِتْر الليل", 980, 170);
+      ctx.fillText("تحت سِتْر الليل", 980, 165);
 
       // Top Divider
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(100, 210);
-      ctx.lineTo(980, 210);
+      ctx.moveTo(100, 200);
+      ctx.lineTo(980, 200);
       ctx.stroke();
 
-      // Wrapped Vent Text
+      // Determine optimal font size based on text length to avoid collision
+      const textLen = post.content.length;
+      let fontSize = 36;
+      let lineHeight = 58;
+
+      if (textLen > 250) {
+        fontSize = 28;
+        lineHeight = 46;
+      } else if (textLen > 150) {
+        fontSize = 32;
+        lineHeight = 52;
+      }
+
       ctx.fillStyle = "#F1F5F9";
-      ctx.font = "36px system-ui, Cairo, sans-serif";
+      ctx.font = `${fontSize}px system-ui, Cairo, sans-serif`;
       
       const words = (`«${post.content}»`).split(" ");
       let line = "";
-      let y = 300;
+      let y = 270;
       const maxWidth = 880;
 
       for (let n = 0; n < words.length; n++) {
@@ -70,16 +82,16 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
         if (metrics.width > maxWidth && n > 0) {
           ctx.fillText(line, 980, y);
           line = words[n] + " ";
-          y += 60;
+          y += lineHeight;
         } else {
           line = testLine;
         }
       }
       ctx.fillText(line, 980, y);
 
-      // Empathetic Reactions Icons & Counts Section on Image
-      let rxY = y + 70;
-      if (rxY > 750) rxY = 750; // Keep within card limits
+      // Dynamic Divider after vent text
+      let rxY = y + 45;
+      if (rxY > 740) rxY = 740;
 
       ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
       ctx.beginPath();
@@ -87,35 +99,46 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
       ctx.lineTo(980, rxY);
       ctx.stroke();
 
-      // Draw Top Reaction Badges
+      // Multi-row wrapping for reaction badges
       let rxX = 980;
-      ctx.font = "22px system-ui, Cairo, sans-serif";
+      let currentY = rxY + 25;
+      ctx.font = "20px system-ui, Cairo, sans-serif";
       ctx.textAlign = "right";
 
       EMPATHETIC_REACTIONS.forEach((r) => {
         const count = post.reactions?.[r.id] || 0;
-        if (count > 0 && rxX > 200) {
+        if (count > 0) {
           const badgeText = `${r.icon} ${r.label} (${count})`;
-          const width = ctx.measureText(badgeText).width + 30;
+          const badgeWidth = ctx.measureText(badgeText).width + 28;
 
-          // Draw pill background
-          ctx.fillStyle = "rgba(26, 32, 53, 0.9)";
-          ctx.beginPath();
-          ctx.roundRect(rxX - width, rxY + 20, width, 44, 20);
-          ctx.fill();
-          ctx.strokeStyle = "rgba(168, 85, 247, 0.4)";
-          ctx.stroke();
+          // If badge exceeds left margin (100px), wrap to next row
+          if (rxX - badgeWidth < 100) {
+            rxX = 980;
+            currentY += 50;
+          }
 
-          // Draw pill text
-          ctx.fillStyle = "#E2E8F0";
-          ctx.fillText(badgeText, rxX - 15, rxY + 50);
+          if (currentY < 880) {
+            // Draw pill background
+            ctx.fillStyle = "rgba(26, 32, 53, 0.9)";
+            ctx.beginPath();
+            ctx.roundRect(rxX - badgeWidth, currentY, badgeWidth, 38, 16);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(168, 85, 247, 0.4)";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
 
-          rxX -= (width + 15);
+            // Draw pill text
+            ctx.fillStyle = "#E2E8F0";
+            ctx.fillText(badgeText, rxX - 14, currentY + 26);
+
+            rxX -= (badgeWidth + 12);
+          }
         }
       });
 
       // Bottom Watermark & QR Code Divider
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(100, 910);
       ctx.lineTo(980, 910);
@@ -130,12 +153,11 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
       ctx.font = "22px system-ui, Cairo, sans-serif";
       ctx.fillText("نَهْرُ النِّسْيَانِ وَالْخَلاصِ", 980, 1005);
 
-      // Aesthetic QR Code Placeholder Box Drawing
+      // Aesthetic QR Code Box
       const qrSize = 100;
       const qrX = 100;
       const qrY = 930;
 
-      // Outer box
       ctx.fillStyle = "#0B0D14";
       ctx.beginPath();
       ctx.roundRect(qrX, qrY, qrSize, qrSize, 12);
@@ -144,7 +166,6 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Simulated QR pattern grid
       ctx.fillStyle = "#A855F7";
       ctx.fillRect(qrX + 15, qrY + 15, 25, 25);
       ctx.fillRect(qrX + 60, qrY + 15, 25, 25);
@@ -233,7 +254,7 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
               «{post.content}»
             </p>
 
-            {/* Empathetic Reaction Counts Preview */}
+            {/* Empathetic Reaction Counts Preview (Multi-row wrapped) */}
             <div className="flex flex-wrap gap-1.5 py-2 border-b border-white/5 mb-3">
               {EMPATHETIC_REACTIONS.map((r) => {
                 const count = post.reactions?.[r.id] || 0;
@@ -276,7 +297,7 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
           className="w-full py-3 mb-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white font-bold text-xs shadow-lg shadow-purple-950/50 hover:from-purple-500 hover:to-indigo-500 flex items-center justify-center gap-2 transition-all active:scale-95"
         >
           <ImageIcon className="w-4 h-4 text-purple-200" />
-          <span>{downloading ? "جارٍ رسم صورة PNG والتفاعلات والـ QR..." : "تحميل / مشاركة البطاقة كـ (صورة PNG مع التفاعلات والـ QR)"}</span>
+          <span>{downloading ? "جارٍ رسم صورة PNG الملتفة..." : "تحميل / مشاركة البطاقة كـ (صورة PNG)"}</span>
         </button>
 
         {/* Primary Action 2: Social Media Direct Links */}
@@ -325,7 +346,7 @@ export default function ShareCardModal({ isOpen, onClose, post }) {
 
         {/* Footer Note */}
         <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
-          <span>صورة PNG تتضمن التفاعلات الحية ورمز QR المنصة</span>
+          <span>تلتف التفاعلات والنصوص تلقائياً دون تداخل</span>
           <button onClick={onClose} className="text-slate-400 hover:text-white">إغلاق</button>
         </div>
 
