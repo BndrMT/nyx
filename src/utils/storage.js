@@ -37,6 +37,11 @@ export function getStoredPosts() {
     if (data) {
       const parsed = JSON.parse(data);
       const cleaned = cleanExpiredPosts(parsed);
+      // Merge if stored posts count is small to ensure rich 18+ posts dataset
+      if (cleaned.length < MOCK_POSTS.length) {
+        localStorage.setItem(KEYS.LOCAL_POSTS, JSON.stringify(MOCK_POSTS));
+        return MOCK_POSTS;
+      }
       localStorage.setItem(KEYS.LOCAL_POSTS, JSON.stringify(cleaned));
       return cleaned;
     }
@@ -55,7 +60,7 @@ export function saveNewPost(postData) {
     id: newPostId,
     tagId: postData.tagId,
     content: postData.content,
-    retentionDays: postData.retentionDays || 0, // default 0 = forever
+    retentionDays: postData.retentionDays || 0,
     quote: getRandomQuote(),
     createdAt: new Date().toISOString(),
     reactions: {
