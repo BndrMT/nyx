@@ -32,22 +32,8 @@ function stripMetadata(text) {
 function isArabicContent(text) {
   // Check if text is predominantly Arabic
   if (!text) return false;
-  const arabicChars = (text.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g) || []).length;
-  return arabicChars > text.length * 0.3;
-}
-
-function isEmotional(text) {
-  const emotionalIndicators = [
-    "حزين", "أشعر", "قلب", "ألم", "تعب", "وحيد", "صراع",
-    "فراق", "رحيل", "موت", "فقد", "بكاء", "دمع", "غصة",
-    "خذلان", "خيبة", "شوق", "حنين", "خوف", "ضياع", "حيرة",
-    "ندم", "ذكريات", "أمل", "يأس", "مستقبل", "سنوات",
-    "عمر", "حياة", "موت", "روح", "نفس", "وجع", "جرح",
-    "سعادة", "فرح", "ضيقة", "هم", "غم", "سكينة", "سلام",
-    "حب", "ود", "صداقة", "غربة", "بعاد"
-  ];
   const lower = text.toLowerCase();
-  return emotionalIndicators.some(word => lower.includes(word));
+  return arabicChars > text.length * 0.25;
 }
 
 export default async function handler(req, res) {
@@ -61,49 +47,39 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Pick a random subreddit and query
     const subreddit = SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
-    const query = QUERIES[Math.floor(Math.random() * QUERIES.length)];
     
-    // Try the subreddit's hot/top posts first, then search
-    const urls = [
-      `https://www.reddit.com/r/${subreddit}/hot.json?limit=25`,
-      `https://www.reddit.com/r/${subreddit}/.json?limit=25`,
-      `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&restrict_sr=on&sort=top&limit=25&t=year`
-    ];
-
+    // Try multiple subreddits and queries
     let posts = [];
+    let attempts = 0;
     
-    for (const url of urls) {
-      const response = await fetch(url, {
-        headers: {
-          "User-Agent": "NyxApp/1.0 (emotional wellness platform; privacy-first; contact@nyxz.vercel.app)"
-        }
-      });
+    while (posts.length < 3 && attempts < 5) {
+      const sub = SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
+      const q = QUERIES[Math.floor(Math.random() * QUERIES.length)];
+      const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(q)}&sort=top&limit=30&t=year`;
+      attempts++;
 
-      if (!response.ok) continue;
+      try {
+        const response = await fetch(url, {
+          headers: {
+            "User-Agent": "NyxApp/1.0 (emotional wellness)"
+          }
+        });
+        if (!response.ok) continue;
+        const data = await response.json();
+        if (!data?.data?.children) continue;
 
-      const data = await response.json();
-      if (data?.data?.children) {
         for (const child of data.data.children) {
           const t = child.data;
           const text = stripMetadata(t.title + " " + (t.selftext || ""));
-          
-          if (
-            text.length > 60 &&
-            isArabicContent(text) &&
-            isEmotional(text)
-          ) {
+          if (text.length > 40 && isArabicContent(text)) {
             posts.push({
               content: text.substring(0, 500),
-              score: t.score || 0,
-              created: t.created_utc || 0
+              score: t.score || 0
             });
           }
         }
-      }
-      
-      if (posts.length >= 5) break;
+      } catch (_e) { continue; }
     }
 
     // Sort by score (most engaging first)
