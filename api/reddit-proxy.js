@@ -10,12 +10,6 @@ const ARABIC_SUBS = [
   "Yemen", "sudan", "Palestine", "Qatar", "oman", "bahrain", "UAE", "libya"
 ];
 
-// Verified search terms that return emotional Arabic content
-const EMOTIONAL_TERMS = [
-  "مشاعر", "صحة نفسية", " نفسية ", "وحيد", "حزين",
-  "قلبي يتوجع", "مشكلتي", "أحس", "حياتي", "ضيق"
-];
-
 function stripMetadata(text) {
   if (!text) return "";
   return text
@@ -52,14 +46,13 @@ export default async function handler(req, res) {
   try {
     const subreddit = ARABIC_SUBS[Math.floor(Math.random() * ARABIC_SUBS.length)];
     
-    // Try multiple subreddits and emotional search terms
+    // Fetch hot/top posts from random Arabic subs (no search API needed)
     let posts = [];
     let attempts = 0;
     
-    while (posts.length < 3 && attempts < 8) {
+    while (posts.length < 3 && attempts < 10) {
       const sub = ARABIC_SUBS[Math.floor(Math.random() * ARABIC_SUBS.length)];
-      const term = EMOTIONAL_TERMS[Math.floor(Math.random() * EMOTIONAL_TERMS.length)];
-      const url = `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(term)}&restrict_sr=on&sort=top&limit=20&t=year`;
+      const url = `https://www.reddit.com/r/${sub}/hot.json?limit=30`;
       attempts++;
 
       try {
@@ -68,15 +61,9 @@ export default async function handler(req, res) {
             "User-Agent": "NyxApp/1.0 (emotional wellness)"
           }
         });
-        if (!response.ok) {
-          console.log("Reddit HTTP", response.status, "for", sub, term);
-          continue;
-        }
+        if (!response.ok) continue;
         const data = await response.json();
-        if (!data?.data?.children || data.data.children.length === 0) {
-          console.log("No results for", sub, term);
-          continue;
-        }
+        if (!data?.data?.children || data.data.children.length === 0) continue;
 
         for (const child of data.data.children) {
           const t = child.data;
