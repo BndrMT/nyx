@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "./components/Navbar";
 import FilterBar from "./components/FilterBar";
 import PostCard from "./components/PostCard";
@@ -12,12 +12,19 @@ import Footer from "./components/Footer";
 
 import { getStoredPosts, saveNewPost, togglePostReaction, getUserReactions, getOrCreateDeviceUUID, deleteMyPost } from "./utils/storage";
 import { registerServiceWorker } from "./utils/pwa";
-import { Heart, Sparkles, ShieldCheck, PenTool, Wind } from "lucide-react";
+import { Heart, Sparkles, ShieldCheck, PenTool, Wind, Moon, RefreshCw } from "lucide-react";
+
+const BATCH_SIZE = 6;
 
 export default function App() {
   const [posts, setPosts] = useState([]);
   const [userReactions, setUserReactions] = useState({});
   const [activeTag, setActiveTag] = useState("all");
+
+  // Infinite Scroll / Batch Loading state
+  const [displayedCount, setDisplayedCount] = useState(BATCH_SIZE);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreRef = useRef(null);
 
   // Modals state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -35,6 +42,44 @@ export default function App() {
     setPosts(getStoredPosts());
     setUserReactions(getUserReactions());
   }, []);
+
+  // Reset pagination count when active tag changes
+  useEffect(() => {
+    setDisplayedCount(BATCH_SIZE);
+  }, [activeTag]);
+
+  // Infinite Scroll Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [displayedCount, posts, activeTag, isLoadingMore]);
+
+  const handleLoadMore = () => {
+    const filtered = activeTag === "all" ? posts : posts.filter((p) => p.tagId === activeTag);
+    if (displayedCount >= filtered.length) return;
+
+    setIsLoadingMore(true);
+    setTimeout(() => {
+      setDisplayedCount((prev) => prev + BATCH_SIZE);
+      setIsLoadingMore(false);
+    }, 400);
+  };
 
   const handleCreatePost = (newPostData) => {
     const updated = saveNewPost(newPostData);
@@ -70,10 +115,13 @@ export default function App() {
     ? posts
     : posts.filter((p) => p.tagId === activeTag);
 
+  const visiblePosts = filteredPosts.slice(0, displayedCount);
+  const hasMore = displayedCount < filteredPosts.length;
+
   return (
     <div className="min-h-screen bg-[#0B0D14] text-slate-100 flex flex-col selection:bg-purple-900 selection:text-purple-100">
       
-      {/* Sticky Top Navbar (Minimalist: Only همساتي & تثبيت التطبيق) */}
+      {/* Sticky Top Navbar */}
       <Navbar
         onOpenMyPosts={() => setIsMyPostsOpen(true)}
         onOpenPWAInstall={() => setIsPWAInstallOpen(true)}
@@ -117,7 +165,7 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Privacy & Safety Metrics (Aligned underneath buttons) */}
+              {/* Privacy & Safety Metrics */}
               <div className="flex flex-row items-center justify-between sm:justify-end gap-2 text-[10px] text-slate-400 pt-1 border-t border-white/5 w-full">
                 <span className="flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-400" />
@@ -141,10 +189,11 @@ export default function App() {
         {/* Emotion Tag Filters */}
         <FilterBar activeTag={activeTag} onSelectTag={setActiveTag} />
 
-        {/* Posts Silent Feed */}
+        {/* Posts Silent Feed (Batch Loaded / Infinite Scroll) */}
         <section className="space-y-4">
           {filteredPosts.length === 0 ? (
             <div className="py-16 text-center rounded-3xl bg-slate-900/40 border border-slate-800 p-8">
+              <Moon className="w-12 h-12 text-slate-600 mx-auto mb-3 animate-pulse" />
               <h3 className="text-base font-bold text-slate-300">لا يوجد بوح تحت هذا الوسم حالياً</h3>
               <p className="text-xs text-slate-500 mt-1">كن أول من يشارك مشاعره تحت هذا الوسم بحرية وسكون.</p>
               <button
@@ -155,14 +204,39 @@ export default function App() {
               </button>
             </div>
           ) : (
-            filteredPosts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                userReactions={userReactions}
-                onToggleReaction={handleToggleReaction}
-              />
-            ))
+            <>
+              {visiblePosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  userReactions={userReactions}
+                  onToggleReaction={handleToggleReaction}
+                />
+              ))}
+
+              {/* Infinite Scroll Load Trigger & Spinner */}
+              {hasMore && (
+                <div ref={loadMoreRef} className="pt-6 pb-2 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={isLoadingMore}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900/90 border border-purple-500/30 text-purple-200 text-xs font-medium hover:bg-purple-950/60 hover:border-purple-400/50 transition-all"
+                  >
+                    {isLoadingMore ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 text-purple-300 animate-spin" />
+                        <span>جارٍ استكشاف همسات ليلية إضافية...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-3.5 h-3.5 text-purple-400" />
+                        <span>استكشاف المزيد من همسات الليل</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
 
