@@ -46,31 +46,44 @@ export default async function handler(req, res) {
   try {
     const subreddit = ARABIC_SUBS[Math.floor(Math.random() * ARABIC_SUBS.length)];
     
-    // Fetch hot/top posts from random Arabic subs (no search API needed)
     let posts = [];
     let attempts = 0;
+    const urls = [];
     
-    while (posts.length < 3 && attempts < 10) {
+    // Build a list of URLs to try (mix of old.reddit and www, hot and top)
+    for (let i = 0; i < 5; i++) {
       const sub = ARABIC_SUBS[Math.floor(Math.random() * ARABIC_SUBS.length)];
-      const url = `https://www.reddit.com/r/${sub}/hot.json?limit=30`;
+      urls.push(
+        `https://old.reddit.com/r/${sub}/hot.json?limit=25`,
+        `https://www.reddit.com/r/${sub}/hot.json?limit=25`
+      );
+    }
+    
+    for (const url of urls) {
+      if (posts.length >= 3) break;
       attempts++;
-
+      
       try {
         const response = await fetch(url, {
           headers: {
-            "User-Agent": "NyxApp/1.0 (emotional wellness)"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           }
         });
         if (!response.ok) continue;
+        
         const data = await response.json();
-        if (!data?.data?.children || data.data.children.length === 0) continue;
-
+        if (!data?.data?.children) continue;
+        
         for (const child of data.data.children) {
           const t = child.data;
-          const text = stripMetadata(t.title + " " + (t.selftext || ""));
-          if (text.length > 40 && isArabicContent(text)) {
+          const title = (t.title || "").trim();
+          const body = (t.selftext || "").trim();
+          const combined = title + " " + body;
+          
+          // Accept any text that's mostly Arabic and has decent length
+          if (combined.length > 30 && isArabicContent(combined)) {
             posts.push({
-              content: text.substring(0, 500),
+              content: combined.substring(0, 500),
               score: t.score || 0
             });
           }
