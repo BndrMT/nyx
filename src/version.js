@@ -19,7 +19,7 @@
 const VERSION = {
   major: 1,
   minor: 4,
-  patch: 0,
+  patch: 2,
   codename: "نَهْرُ النِّسْيَانِ وَالْخَلاصِ"
 };
 
