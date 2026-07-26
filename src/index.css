@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #0B0D14;
+    color: #F1F5F9;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Cairo', 'Tajawal', sans-serif;
+    direction: rtl;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+/* Hide custom scrollbar for horizontal tag bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Burn and Dissolve Ash Animation for deleting a vent */
+@keyframes burnDissolve {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.98) translateY(-4px);
+    filter: drop-shadow(0 0 15px rgba(244, 63, 94, 0.8)) sepia(1) hue-rotate(320deg);
+    border-color: rgba(244, 63, 94, 0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85) translateY(-12px);
+    filter: blur(10px) brightness(2);
+  }
+}
+
+.animate-burn-dissolve {
+  animation: burnDissolve 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

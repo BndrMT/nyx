@@ -1,0 +1,26 @@
+{
+  "short_name": "نِيكْس Nyx",
+  "name": "نِيكْس - تطبيق البوح والتعاطف الصامت",
+  "description": "مساحة رقمية آمنة للتعبير عن المشاعر المسكوت عنها دون خوف من الأحكام أو التقييم",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0B0D14",
+  "theme_color": "#0B0D14",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar"
+}
